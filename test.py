@@ -24,6 +24,7 @@ def search_tour(cfg, env):
 	print('active search ...')
 	t1 = time()
 	pred_tour = active_search(cfg, env, test_input)
+
 	t2 = time()
 	print('%dmin %1.2fsec\n'%((t2-t1)//60, (t2-t1)%60))
 	env.show(test_input, pred_tour)

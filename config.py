@@ -7,7 +7,7 @@ from datetime import datetime
 def argparser():
 	parser = argparse.ArgumentParser()
 	# main parts
-	parser.add_argument('-m', '--mode', metavar = 'M', type = str, required = True, choices = ['train', 'train_emv', 'test'], help = 'train or train_emv or test')
+	parser.add_argument('-m', '--mode', metavar = 'M', type = str, required = True, choices = ['test', 'train', 'train_emv'], help = 'train or train_emv or test')
 	parser.add_argument('-b', '--batch', metavar = 'B', type = int, default = 512, help = 'batch size, default: 512')
 	parser.add_argument('-t', '--city_t', metavar = 'T', type = int, default = 20, help = 'number of cities(nodes), time sequence, default: 20')
 	parser.add_argument('-s', '--steps', metavar = 'S', type = int, default = 15000, help = 'training steps(epochs), default: 15000')

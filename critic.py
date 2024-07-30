@@ -19,7 +19,7 @@ class PtrNet2(nn.Module):
 		self.final2FC = nn.Sequential(
 					nn.Linear(cfg.hidden, cfg.hidden, bias = False),
 					nn.ReLU(inplace = False),
-					nn.Linear(cfg.hidden, 1, bias = False))
+					nn.Linear(cfg.hidden, 1, bias = False)) # expected length
 		self._initialize_weights(cfg.init_min, cfg.init_max)
 		self.n_glimpse = cfg.n_glimpse
 		self.n_process = cfg.n_process

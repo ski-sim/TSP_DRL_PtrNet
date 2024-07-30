@@ -10,7 +10,7 @@ class Greedy(nn.Module):
 		super().__init__()
 
 	def forward(self, log_p):
-		return torch.argmax(log_p, dim = 1).long()
+		return torch.argmax(log_p, dim = 1).long() # 최대값의 인덱스 (정수)
 
 class Categorical(nn.Module):
 	def __init__(self):
@@ -67,17 +67,17 @@ class PtrNet1(nn.Module):
 			_, (h, c) = self.Decoder(dec_input, (h, c))
 			query = h.squeeze(0)
 			for i in range(self.n_glimpse):
-				query = self.glimpse(query, ref, mask)
-			logits = self.pointer(query, ref, mask)	
-			log_p = torch.log_softmax(logits, dim = -1)
+				query = self.glimpse(query, ref, mask) # hidden_state
+			logits = self.pointer(query, ref, mask)	 # attention 
+			log_p = torch.log_softmax(logits, dim = -1) # probability 
 			next_node = self.city_selecter(log_p)
 			dec_input = torch.gather(input = embed_enc_inputs, dim = 1, index = next_node.unsqueeze(-1).unsqueeze(-1).repeat(1, 1, embed))
 			
 			pi_list.append(next_node)
 			log_ps.append(log_p)
 			mask += torch.zeros((batch,city_t), device = device).scatter_(dim = 1, index = next_node.unsqueeze(1), value = 1)
-			
-		pi = torch.stack(pi_list, dim = 1)
+			# scatter_ 함수는 주어진 index 위치에 value를 설정합니다
+		pi = torch.stack(pi_list, dim = 1) # pi_list라는 리스트에 있는 텐서들을 하나의 텐서로 쌓아 새로운 차원을 추가하는 역할
 		ll = self.get_log_likelihood(torch.stack(log_ps, 1), pi)
 		return pi, ll 
 	
@@ -129,7 +129,7 @@ class PtrNet1(nn.Module):
 			return: (batch)
 		"""
 		log_p = torch.gather(input = _log_p, dim = 2, index = pi[:,:,None])
-		return torch.sum(log_p.squeeze(-1), 1)
+		return torch.sum(log_p.squeeze(-1), 1) 
 				
 if __name__ == '__main__':
 	cfg = load_pkl(pkl_parser().path)

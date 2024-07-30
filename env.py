@@ -39,7 +39,7 @@ class Env_tsp():
 		list = [self.get_nodes() for i in range(self.batch)]
 		inputs = torch.stack(list, dim = 0)
 		return inputs
-	
+	#
 	def get_batch_nodes(self, n_samples, seed = None):
 		'''
 		return nodes:(batch,city_t,2)
@@ -56,8 +56,9 @@ class Env_tsp():
 		'''
 		list = [self.get_random_tour() for i in range(self.batch)]
 		tours = torch.stack(list, dim = 0)
-		return tours
-		
+
+		return tours.long()
+	#
 	def stack_l(self, inputs, tours):
 		'''
 		inputs:(batch,city_t,2)
@@ -75,6 +76,7 @@ class Env_tsp():
 		tours: (batch, city_t), predicted tour
 		d: (batch, city_t, 2)
 		"""
+
 		d = torch.gather(input = inputs, dim = 1, index = tours[:,:,None].repeat(1,1,2))
 		return (torch.sum((d[:, 1:] - d[:, :-1]).norm(p = 2, dim = 2), dim = 1)
 				+ (d[:, 0] - d[:, -1]).norm(p = 2, dim = 1))# distance from last node to first selected node)
@@ -134,7 +136,7 @@ class Env_tsp():
 		'''
 		l = 0
 		for i in range(self.city_t):
-			l += get_2city_distance(nodes[tour[i]], nodes[tour[(i+1)%self.city_t]])
+			l += get_2city_distance(nodes[tour[i]], nodes[tour[(i+1)%self.city_t]]) # tour[i]: nodes의 인덱스
 		return l
 
 	def get_random_tour(self):

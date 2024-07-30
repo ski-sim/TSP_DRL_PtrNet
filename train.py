@@ -21,7 +21,7 @@ def train_model(cfg, env, log_path = None):
 		param_path = cfg.log_dir + '%s_%s_param.csv'%(date, cfg.task)# cfg.log_dir = ./Csv/
 		print(f'generate {param_path}')
 		with open(param_path, 'w') as f:
-			f.write(''.join('%s,%s\n'%item for item in vars(cfg).items()))
+			f.write(''.join('%s,%s\n'%item for item in vars(cfg).items())) # vars(cfg) : 딕셔너리 타입
 
 	act_model = PtrNet1(cfg)
 	if cfg.optim == 'Adam':
@@ -43,7 +43,7 @@ def train_model(cfg, env, log_path = None):
 		ave_cri_loss = 0.
 
 	mse_loss = nn.MSELoss()
-	dataset = Generator(cfg, env)
+	dataset = Generator(cfg, env) # (samples, cities, 2)
 	dataloader = DataLoader(dataset, batch_size = cfg.batch, shuffle = True)
 
 	ave_act_loss, ave_L = 0., 0.
@@ -52,10 +52,10 @@ def train_model(cfg, env, log_path = None):
 	# for i, inputs in tqdm(enumerate(dataloader)):
 	for i, inputs in enumerate(dataloader):
 		inputs = inputs.to(device)
-		pred_tour, ll = act_model(inputs, device)
-		real_l = env.stack_l_fast(inputs, pred_tour)
+		pred_tour, ll = act_model(inputs, device) # pred_tour : pi(action 집합), ll : log-likelihood
+		real_l = env.stack_l_fast(inputs, pred_tour) # real_l : pred_tour의 length
 		if cfg.mode == 'train':
-			pred_l = cri_model(inputs, device)
+			pred_l = cri_model(inputs, device) # pred_l : expected length
 			cri_loss = mse_loss(pred_l, real_l.detach())
 			cri_optim.zero_grad()
 			cri_loss.backward()
@@ -70,7 +70,7 @@ def train_model(cfg, env, log_path = None):
 				L = (L * 0.9) + (0.1 * real_l.detach().mean())
 			pred_l = L
 
-		adv = real_l.detach() - pred_l.detach()
+		adv = real_l.detach() - pred_l.detach() # .detach() : 함수는 원래 텐서와 저장소를 공유하지만 기울기를 계산하지 않는 텐서를 만듭니다.
 		act_loss = (adv * ll).mean()
 		act_optim.zero_grad()
 		act_loss.backward()
@@ -125,7 +125,7 @@ def train_model(cfg, env, log_path = None):
 		print('save model...')
 
 if __name__ == '__main__':
-	cfg = load_pkl(pkl_parser().path)
+	cfg = load_pkl(pkl_parser().path) # pkl_parser 수정
 	env = Env_tsp(cfg)
 
 	if cfg.mode in ['train', 'train_emv']:

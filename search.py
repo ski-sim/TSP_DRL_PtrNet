@@ -30,7 +30,7 @@ def active_search(cfg, env, test_input, log_path = None):
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	test_inputs = test_input.repeat(cfg.batch,1,1).to(device)
 	random_tours = env.stack_random_tours().to(device)
-	baseline = env.stack_l_fast(test_inputs, random_tours)
+	baseline = env.stack_l_fast(test_inputs, random_tours) # 랜덤하게 선택한 tour를 baseline
 	l_min = baseline[0]
 	
 	act_model = PtrNet1(cfg)
@@ -50,9 +50,9 @@ def active_search(cfg, env, test_input, log_path = None):
 		This increases the stochasticity of the sampling procedure and leads to large improvements in Active Search.
 		'''
 		test_inputs = test_inputs.to(device)
-		shuffle_inputs = env.shuffle(test_inputs)
+		shuffle_inputs = env.shuffle(test_inputs) # 내부의 순서만 shuffle
 		pred_shuffle_tours, neg_log = act_model(shuffle_inputs, device)
-		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs, device).to(device)
+		pred_tours = env.back_tours(pred_shuffle_tours, shuffle_inputs, test_inputs, device).to(device) # shuffle 된 순서 복원
 		
 		l_batch = env.stack_l_fast(test_inputs, pred_tours)
 		
